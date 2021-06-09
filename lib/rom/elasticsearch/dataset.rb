@@ -30,6 +30,9 @@ module ROM
       # Default query options
       ALL = {query: {match_all: EMPTY_HASH}}.freeze
 
+      # The id key in raw results
+      ID_KEY = "_id"
+
       # The source key in raw results
       SOURCE_KEY = "_source"
 
@@ -58,7 +61,7 @@ module ROM
       attr_reader :tuple_proc
 
       # default tuple proc which extracts raw source data from response item
-      TUPLE_PROC = -> t { t[SOURCE_KEY] }
+      TUPLE_PROC = -> t { t[SOURCE_KEY].merge(id: t[ID_KEY]) }
 
       # tuple proc used when :include_metadata is enabled, resulting tuples
       # will include raw response hash under _metadata key
