@@ -56,6 +56,10 @@ module ROM
       #   @return [Hash] memoized response from the client
       option :response, optional: true, reader: false
 
+      # @!attribute [r] aggregations
+      #   @return [Array<Aggregations>] an array of aggregation objects
+      option :aggregations, default: -> { [] }
+
       # @!attribute [r] tuple_proc
       #   @return [Proc] low-level tuple processing function used in #each
       attr_reader :tuple_proc
@@ -67,10 +71,12 @@ module ROM
       # will include raw response hash under _metadata key
       TUPLE_PROC_WITH_METADATA = -> t { TUPLE_PROC[t].merge(_metadata: t) }
 
+      option :tuple_proc, default: -> { TUPLE_PROC }
+
       # @api private
       def initialize(*args, **kwargs)
         super
-        @tuple_proc = options[:include_metadata] ? TUPLE_PROC_WITH_METADATA : TUPLE_PROC
+        @tuple_proc = options[:tuple_proc] || (options[:include_metadata] ? TUPLE_PROC_WITH_METADATA : TUPLE_PROC)
       end
 
       # Put new data under configured index
@@ -187,6 +193,21 @@ module ROM
         end
       end
 
+      # Return a new dataset with new aggregations
+      #
+      # @param [Array<Aggregation>] new New aggregations
+      #
+      # @return [Hash]
+      #
+      # @api public
+      def aggregate(new = nil)
+        if new.nil?
+          @aggregations
+        else
+          with(aggregations: aggregations.concat(new))
+        end
+      end
+      
       # Return a new dataset with new params
       #
       # @param [Hash] new New params data

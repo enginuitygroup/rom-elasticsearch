@@ -163,6 +163,17 @@ module ROM
         Loaded.new(new(dataset.call))
       end
 
+      # Return a relation with aggregations specified
+      #
+      # @param [Array<ROM::Elasticsearch::Aggregation>] aggregations
+      #
+      # @return [Relation]
+      #
+      # @api public
+      def aggregate(aggregations)
+        new(dataset.aggregate(aggregations))
+      end
+
       # Return a relation with changed sorting logic
       #
       # @param [Array<Symbol,Attribute>] attrs
