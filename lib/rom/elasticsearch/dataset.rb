@@ -61,7 +61,7 @@ module ROM
       attr_reader :tuple_proc
 
       # default tuple proc which extracts raw source data from response item
-      TUPLE_PROC = -> t { t[SOURCE_KEY].merge(id: t[ID_KEY]) }
+      TUPLE_PROC = -> t { t[SOURCE_KEY].merge(id: t[ID_KEY]).symbolize_keys }
 
       # tuple proc used when :include_metadata is enabled, resulting tuples
       # will include raw response hash under _metadata key
