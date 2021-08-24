@@ -3,26 +3,20 @@
 module ROM
   module Elasticsearch
     class Aggregation
-      attr_reader :name, :field, :parameters
-
-      def self.[](name)
-        if name.is_a?(self)
-          name
-        else
-          new(name)
-        end
-      end
+      attr_reader :label, :name, :field, :parameters, :children
 
       def initialize(name)
         @name       = name
+        @label      = nil
         @field      = nil
         @parameters = {}
         @children   = []
       end
 
-      def call(field, **kwargs)
+      def call(field, label: nil, **kwargs)
         @field      = field
         @parameters = kwargs
+        @label      = label || "#{name}_#{field}"
         self
       end
 

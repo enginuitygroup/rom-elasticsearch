@@ -7,6 +7,7 @@ require "rom/elasticsearch/relation/loaded"
 require "rom/elasticsearch/types"
 require "rom/elasticsearch/schema"
 require "rom/elasticsearch/attribute"
+require "rom/elasticsearch/aggregation"
 
 module ROM
   module Elasticsearch
@@ -170,8 +171,8 @@ module ROM
       # @return [Relation]
       #
       # @api public
-      def aggregate(aggregations)
-        new(dataset.aggregate(aggregations))
+      def aggregations(aggregations)
+        new(dataset.aggregations(aggregations))
       end
 
       # Return a relation with changed sorting logic

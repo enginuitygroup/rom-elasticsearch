@@ -4,6 +4,7 @@ require "rom/initializer"
 
 require "rom/elasticsearch/query_methods"
 require "rom/elasticsearch/scroll_methods"
+require "rom/elasticsearch/aggregation/query_resolver"
 require "rom/elasticsearch/errors"
 
 module ROM
@@ -57,7 +58,7 @@ module ROM
       option :response, optional: true, reader: false
 
       # @!attribute [r] aggregations
-      #   @return [Array<Aggregations>] an array of aggregation objects
+      #   @return [Array<Aggregation>] an array of aggregation objects
       option :aggregations, default: -> { [] }
 
       # @!attribute [r] tuple_proc
@@ -200,10 +201,11 @@ module ROM
       # @return [Hash]
       #
       # @api public
-      def aggregate(new = nil)
+      def aggregations(new = nil)
         if new.nil?
           @aggregations
         else
+          new = [new] unless new.is_a?(Enumerable)
           with(aggregations: aggregations.concat(new))
         end
       end
@@ -314,7 +316,12 @@ module ROM
 
       # @api private
       def response
-        options[:response] || client.search(**params, body: body)
+        options[:response] || client.search(**params, body: body_with_aggregations)
+      end
+
+      def body_with_aggregations
+        return body if aggregations.empty?
+        body.merge(aggs: body.fetch(:aggs, {}).merge(Aggregation::QueryResolver.new(aggregations).to_query_fragment))
       end
     end
   end
