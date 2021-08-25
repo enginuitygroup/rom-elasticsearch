@@ -5,7 +5,12 @@ module ROM
     class Aggregation
       attr_reader :label, :name, :field, :parameters, :children
 
-      def initialize(name)
+      def self.new(name)
+        return name if name.is_a?(self)
+        super
+      end
+
+      def initialize(name)  
         @name       = name
         @label      = nil
         @field      = nil

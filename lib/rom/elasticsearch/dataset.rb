@@ -66,19 +66,18 @@ module ROM
       attr_reader :tuple_proc
 
       # default tuple proc which extracts raw source data from response item
-      TUPLE_PROC = -> t { t[SOURCE_KEY].merge(id: t[ID_KEY]) }
+      TUPLE_PROC = -> t { t[SOURCE_KEY] }
 
       # tuple proc used when :include_metadata is enabled, resulting tuples
       # will include raw response hash under _metadata key
       TUPLE_PROC_WITH_METADATA = -> t { TUPLE_PROC[t].merge(_metadata: t) }
 
-      option :tuple_proc, default: -> { TUPLE_PROC }
+      option :tuple_proc, default: -> { options[:include_metadata] ? TUPLE_PROC_WITH_METADATA : TUPLE_PROC }
 
-      # @api private
-      def initialize(*args, **kwargs)
-        super
-        @tuple_proc = options[:tuple_proc] || (options[:include_metadata] ? TUPLE_PROC_WITH_METADATA : TUPLE_PROC)
-      end
+      # # @api private
+      # def initialize(*args, **kwargs)
+      #   super
+      # end
 
       # Put new data under configured index
       #

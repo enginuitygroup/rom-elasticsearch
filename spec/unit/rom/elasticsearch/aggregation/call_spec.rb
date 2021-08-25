@@ -3,7 +3,7 @@
 require "rom/elasticsearch/aggregation"
 
 RSpec.describe ROM::Elasticsearch::Aggregation, "#call" do
-  subject(:aggregation) { described_class[:sum] }
+  subject(:aggregation) { described_class.new(:sum) }
 
   it "returns itself" do
     result = aggregation.call("name")
@@ -15,19 +15,19 @@ RSpec.describe ROM::Elasticsearch::Aggregation, "#call" do
     expect(result.field).to eql("name")
   end
 
-  it "sets a default alias" do
+  it "sets a default label" do
     result = aggregation.call("name")
-    expect(result.alias).to eql("sum_name")
+    expect(result.label).to eql("sum_name")
   end
 
-  it "sets a specified alias" do
-    result = aggregation.call("name", alias: "custom_alias")
-    expect(result.alias).to eql("custom_alias")
+  it "sets a specified label" do
+    result = aggregation.call("name", label: "custom_label")
+    expect(result.label).to eql("custom_label")
   end
 
-  it "doesn't include the alias in the parameters" do
-    result = aggregation.call("name", alias: "custom_alias")
-    expect(result.paramters).not_to include(alias: "custom_alias")
+  it "doesn't include the label in the parameters" do
+    result = aggregation.call("name", label: "custom_label")
+    expect(result.parameters).not_to include(label: "custom_label")
   end
   
   it "sets the specified parameters" do
