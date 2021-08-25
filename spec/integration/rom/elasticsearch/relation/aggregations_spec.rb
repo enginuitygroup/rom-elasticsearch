@@ -53,12 +53,12 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
 
     it "returns an aggregation with the correct value" do
       result = relation.aggregations(aggregation).call
-      expect(result.aggregations.first.value).to eq 500
+      expect(result.aggregations["sum_purchase_price"].value).to eq 500
     end
 
     it "returns an aggregation with an empty buckets list" do
       result = relation.aggregations(aggregation).call
-      expect(result.aggregations.first.buckets).to eq []
+      expect(result.aggregations["sum_purchase_price"].buckets).to eq []
     end
 
     it "returns aggregations with a search query" do
@@ -68,7 +68,7 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
         .call
 
       expect(result.aggregations.count).to eq 1
-      expect(result.aggregations.first.value).to eq 300
+      expect(result.aggregations["sum_purchase_price"].value).to eq 300
     end
   end
 
@@ -82,12 +82,12 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
 
     it "returns an aggregation with the correct value" do
       result = relation.aggregations(aggregation).call
-      expect(result.aggregations.first.value).to eq 100
+      expect(result.aggregations["avg_purchase_price"].value).to eq 100
     end
 
     it "returns an aggregation with an empty buckets list" do
       result = relation.aggregations(aggregation).call
-      expect(result.aggregations.first.buckets).to eq []
+      expect(result.aggregations["avg_purchase_price"].buckets).to eq []
     end
 
     it "returns aggregations with a search query" do
@@ -97,7 +97,7 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
         .call
 
       expect(result.aggregations.count).to eq 1
-      expect(result.aggregations.first.value).to eq 150
+      expect(result.aggregations["avg_purchase_price"].value).to eq 150
     end
   end
   
@@ -107,13 +107,13 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
     it "returns aggregations and buckets" do
       result = relation.aggregations(aggregation).call
       expect(result.aggregations.count).to eq 1
-      expect(result.aggregations.first.buckets.count).to eq 2
+      expect(result.aggregations["terms_purchase_type"].buckets.count).to eq 2
     end
 
     it "returns an aggregation with the correct buckets" do
       result = relation.aggregations(aggregation).call
-      expect(result.aggregations.first.buckets).to include a_hash_including(key: "credit", doc_count: 2)
-      expect(result.aggregations.first.buckets).to include a_hash_including(key: "cash", doc_count: 3)
+      expect(result.aggregations["terms_purchase_type"].buckets).to include a_hash_including(key: "credit", doc_count: 2)
+      expect(result.aggregations["terms_purchase_type"].buckets).to include a_hash_including(key: "cash", doc_count: 3)
     end
 
     it "applies the aggregation to a search query" do
@@ -126,9 +126,9 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
         .call
 
       expect(result.aggregations.count).to eq 1
-      expect(result.aggregations.first.buckets.count).to eq 2
-      expect(result.aggregations.first.buckets).to include a_hash_including(key: "credit", doc_count: 2)
-      expect(result.aggregations.first.buckets).to include a_hash_including(key: "cash", doc_count: 1)
+      expect(result.aggregations["terms_purchase_type"].buckets.count).to eq 2
+      expect(result.aggregations["terms_purchase_type"].buckets).to include a_hash_including(key: "credit", doc_count: 2)
+      expect(result.aggregations["terms_purchase_type"].buckets).to include a_hash_including(key: "cash", doc_count: 1)
     end
   end
 
@@ -142,15 +142,15 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
     it "returns aggregations and buckets" do
       result = relation.aggregations(aggregation).call
       expect(result.aggregations.count).to eq 1
-      expect(result.aggregations.first.buckets.count).to eq 2
-      expect(result.aggregations.first.buckets.first[:children].count).to eq 1
-      expect(result.aggregations.first.buckets[1][:children].count).to eq 1
+      expect(result.aggregations["terms_purchase_price"].buckets.count).to eq 2
+      expect(result.aggregations["terms_purchase_price"].buckets.first[:children].count).to eq 1
+      expect(result.aggregations["terms_purchase_price"].buckets[1][:children].count).to eq 1
     end
 
     it "returns an aggregation with the correct buckets" do
       result = relation.aggregations(aggregation).call
       # byebug
-      expect(result.aggregations.first.buckets).to include a_hash_including(
+      expect(result.aggregations["terms_purchase_price"].buckets).to include a_hash_including(
         key: "credit", 
         doc_count: 2,
         children: including(
@@ -158,7 +158,7 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
         )
       )
 
-      expect(result.aggregations.first.buckets).to include a_hash_including(
+      expect(result.aggregations["terms_purchase_price"].buckets).to include a_hash_including(
         key: "cash", 
         doc_count: 3,
         children: including(

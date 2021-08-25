@@ -7,12 +7,12 @@ module ROM
     class Aggregation
       class ResponseResolver
         def self.call(aggregations, response)
-          aggregations.map do |aggregation|
-            Loaded.new(
+          aggregations.reduce({}) do |resolved, aggregation|
+            resolved.merge(aggregation.label => Loaded.new(
               aggregation,
               response[aggregation.label],
               self
-            )
+            ))
           end
         end
       end

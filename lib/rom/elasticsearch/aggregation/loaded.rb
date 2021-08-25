@@ -13,19 +13,20 @@ module ROM
         param :aggregation_response
         param :resolver
 
-        Bucket = Types::Hash.schema(
-          key:       Types::String,
-          doc_count: Types::Integer,
-          children:  Types::Array.of(Types::Instance(self))
-        ).with_key_transform(&:to_sym)
+        def has_buckets?
+          aggregation_response.has_key?('buckets')
+        end
 
         def buckets
-          return [] unless aggregation_response.has_key?('buckets')
+          return [] unless has_buckets?
           aggregation_response['buckets'].map do |bucket|
-            bucket[:children] = resolver.call(aggregation.children, bucket)
-            Bucket[bucket]
+            LoadedBucket.new(aggregation, bucket, resolver)
           end
         end        
+
+        def label
+          aggregation.label
+        end
 
         def method_missing(name)
           raise NameError, "#{name} is not a valid attribute" unless aggregation_response.has_key?(name.to_s)

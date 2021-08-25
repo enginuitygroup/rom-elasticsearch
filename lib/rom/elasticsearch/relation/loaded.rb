@@ -33,7 +33,6 @@ module ROM
         #
         # @api public
         def aggregations
-          byebug if response['aggregations'].nil?
           Aggregation::ResponseResolver.call(
             source.dataset.options[:aggregations],
             response['aggregations']
