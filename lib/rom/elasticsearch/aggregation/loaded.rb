@@ -14,22 +14,27 @@ module ROM
         param :resolver
 
         def has_buckets?
-          aggregation_response.has_key?('buckets')
+          aggregation_response.key?("buckets")
         end
 
         def buckets
           return [] unless has_buckets?
-          aggregation_response['buckets'].map do |bucket|
-            LoadedBucket.new(aggregation, bucket, resolver)
+
+          aggregation_response["buckets"].map do |bucket|
+            ROM::Elasticsearch::Aggregation::LoadedBucket.new(aggregation, bucket, resolver)
           end
-        end        
+        end
 
         def label
           aggregation.label
         end
 
         def method_missing(name)
-          raise NameError, "#{name} is not a valid attribute" unless aggregation_response.has_key?(name.to_s)
+          unless aggregation_response.key?(name.to_s)
+            raise NameError,
+                  "#{name} is not a valid attribute"
+          end
+
           aggregation_response[name.to_s]
         end
       end
