@@ -2,6 +2,7 @@
 
 require "rom/initializer"
 require "rom/types"
+require "rom/elasticsearch/aggregation/loaded_bucket"
 
 module ROM
   module Elasticsearch
