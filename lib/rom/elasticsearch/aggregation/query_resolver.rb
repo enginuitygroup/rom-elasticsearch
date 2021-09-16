@@ -7,13 +7,13 @@ module ROM
     class Aggregation
       class QueryResolver
         extend Initializer
-        
+
         param :aggregations, default: -> { [] }
 
         def empty?
           @aggregations.empty?
         end
-        
+
         def to_query_fragment
           @aggregations.reduce({}) do |fragment, aggregation|
             fragment.merge(hash_for(aggregation))
@@ -21,10 +21,10 @@ module ROM
         end
 
         private def hash_for(aggregation)
-          body = aggregation.parameters.merge({ field: aggregation.field.to_s })
+          body = aggregation.parameters.merge({field: aggregation.field.to_s})
           sub_aggs = {}
 
-          if !aggregation.children.empty?
+          unless aggregation.children.empty?
             sub_aggs[:aggs] = QueryResolver.new(aggregation.children).to_query_fragment
           end
 

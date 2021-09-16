@@ -7,10 +7,11 @@ module ROM
 
       def self.new(name)
         return name if name.is_a?(self)
+
         super
       end
 
-      def initialize(name)  
+      def initialize(name)
         @name       = name
         @label      = nil
         @field      = nil
@@ -27,7 +28,7 @@ module ROM
 
       def <<(aggregation)
         @children << aggregation if aggregation.is_a?(self.class)
-      end 
+      end
     end
   end
 end

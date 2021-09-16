@@ -63,7 +63,7 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
 
     it "returns aggregations with a search query" do
       result = relation
-        .query(match: { purchase_type: "credit"})
+        .query(match: {purchase_type: "credit"})
         .aggregations(aggregation)
         .call
 
@@ -92,7 +92,7 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
 
     it "returns aggregations with a search query" do
       result = relation
-        .query(match: { purchase_type: "credit"})
+        .query(match: {purchase_type: "credit"})
         .aggregations(aggregation)
         .call
 
@@ -100,7 +100,7 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
       expect(result.aggregations["avg_purchase_price"].value).to eq 150
     end
   end
-  
+
   describe "bucket aggregation" do
     let(:aggregation) { ROM::Elasticsearch::Aggregation.new(:terms).call(:purchase_type) }
 
@@ -119,9 +119,9 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
     it "applies the aggregation to a search query" do
       result = relation
         .query(bool: {
-          must: { match_all: {} },
-          filter: { range: { purchase_price: { gte: 100 } } }
-        })
+                 must: {match_all: {}},
+                 filter: {range: {purchase_price: {gte: 100}}}
+               })
         .aggregations(aggregation)
         .call
 
@@ -151,18 +151,18 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
       result = relation.aggregations(aggregation).call
       # byebug
       expect(result.aggregations["terms_purchase_price"].buckets).to include a_hash_including(
-        key: "credit", 
+        key: "credit",
         doc_count: 2,
         children: including(
-          satisfying("has correct value") {|o| o.value == 300.0 }
+          satisfying("has correct value") { |o| o.value == 300.0 }
         )
       )
 
       expect(result.aggregations["terms_purchase_price"].buckets).to include a_hash_including(
-        key: "cash", 
+        key: "cash",
         doc_count: 3,
         children: including(
-          satisfying("has correct value") {|o| o.value == 200.0 }
+          satisfying("has correct value") { |o| o.value == 200.0 }
         )
       )
     end
@@ -171,5 +171,4 @@ RSpec.describe ROM::Elasticsearch::Relation, ".aggregations" do
   it "applies a bucket aggregation to a search query"
 
   it "applies a metrics aggregation under a bucket aggregation"
-
 end

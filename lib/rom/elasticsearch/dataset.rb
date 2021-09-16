@@ -72,7 +72,9 @@ module ROM
       # will include raw response hash under _metadata key
       TUPLE_PROC_WITH_METADATA = -> t { TUPLE_PROC[t].merge(_metadata: t) }
 
-      option :tuple_proc, default: -> { options[:include_metadata] ? TUPLE_PROC_WITH_METADATA : TUPLE_PROC }
+      option :tuple_proc, default: -> {
+                                     options[:include_metadata] ? TUPLE_PROC_WITH_METADATA : TUPLE_PROC
+                                   }
 
       # # @api private
       # def initialize(*args, **kwargs)
@@ -105,7 +107,7 @@ module ROM
       #
       # @api public
       def mappings
-        client.indices.get_mapping[index.to_s]['mappings']
+        client.indices.get_mapping[index.to_s]["mappings"]
       end
 
       # Delete everything matching configured params and/or body
@@ -208,7 +210,7 @@ module ROM
           with(aggregations: aggregations.concat(new))
         end
       end
-      
+
       # Return a new dataset with new params
       #
       # @param [Hash] new New params data
@@ -320,7 +322,9 @@ module ROM
 
       def body_with_aggregations
         return body if aggregations.empty?
-        body.merge(aggs: body.fetch(:aggs, {}).merge(Aggregation::QueryResolver.new(aggregations).to_query_fragment))
+
+        body.merge(aggs: body.fetch(:aggs,
+                                    {}).merge(Aggregation::QueryResolver.new(aggregations).to_query_fragment))
       end
     end
   end

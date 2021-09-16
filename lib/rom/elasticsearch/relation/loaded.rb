@@ -15,7 +15,7 @@ module ROM
         #
         # @api public
         def total_hits
-          response['hits']['total']['value']
+          response["hits"]["total"]["value"]
         end
 
         # Return raw response from the ES client
@@ -35,7 +35,7 @@ module ROM
         def aggregations
           Aggregation::ResponseResolver.call(
             source.dataset.options[:aggregations],
-            response['aggregations']
+            response["aggregations"]
           )
         end
       end

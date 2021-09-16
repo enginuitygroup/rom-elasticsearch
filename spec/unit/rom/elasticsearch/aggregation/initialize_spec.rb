@@ -3,7 +3,6 @@
 require "rom/elasticsearch/aggregation"
 
 RSpec.describe ROM::Elasticsearch::Aggregation, ".new" do
-
   it "returns an instance with the correct name" do
     agg = described_class.new(:sum)
     expect(agg.name).to eql(:sum)

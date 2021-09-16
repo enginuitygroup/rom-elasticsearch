@@ -29,7 +29,7 @@ RSpec.describe ROM::Elasticsearch::Aggregation, "#call" do
     result = aggregation.call("name", label: "custom_label")
     expect(result.parameters).not_to include(label: "custom_label")
   end
-  
+
   it "sets the specified parameters" do
     result = aggregation.call("name", foo: "bar", baz: 5)
     expect(result.parameters).to include(foo: "bar", baz: 5)

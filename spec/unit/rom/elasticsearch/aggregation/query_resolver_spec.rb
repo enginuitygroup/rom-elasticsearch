@@ -13,8 +13,8 @@ RSpec.describe ROM::Elasticsearch::Aggregation::QueryResolver do
 
     it "returns a hash with the correct body" do
       expect(fragment).to eql({
-        "sum_price" => { "sum": { "field": "price" } }
-      })
+                                "sum_price" => {sum: {field: "price"}}
+                              })
     end
   end
 
@@ -28,9 +28,9 @@ RSpec.describe ROM::Elasticsearch::Aggregation::QueryResolver do
 
     it "returns a hash with the correct body" do
       expect(fragment).to eql({
-        "sum_price" => { "sum": { "field": "price" } },
-        "avg_price" => { "avg": { "field": "price" } }
-      })
+                                "sum_price" => {sum: {field: "price"}},
+                                "avg_price" => {avg: {field: "price"}}
+                              })
     end
   end
 
@@ -46,15 +46,15 @@ RSpec.describe ROM::Elasticsearch::Aggregation::QueryResolver do
 
     it "returns a hash with the correct body" do
       expect(fragment).to eql({
-        "range_price" => {
-          "range": { "field": "price" },
-          "aggs": {
-            "sum_price" => {
-              "sum": { "field": "price" }
-            }
-          }
-        }
-      })
+                                "range_price" => {
+                                  range: {field: "price"},
+                                  aggs: {
+                                    "sum_price" => {
+                                      sum: {field: "price"}
+                                    }
+                                  }
+                                }
+                              })
     end
   end
 end

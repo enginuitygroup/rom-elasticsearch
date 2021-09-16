@@ -25,7 +25,11 @@ module ROM
         end
 
         def method_missing(name)
-          raise NameError, "#{name} is not a valid attribute" unless bucket_payload.has_key?(name.to_s)
+          unless bucket_payload.key?(name.to_s)
+            raise NameError,
+                  "#{name} is not a valid attribute"
+          end
+
           bucket_payload[name.to_s]
         end
       end
