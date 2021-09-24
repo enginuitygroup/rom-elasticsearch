@@ -191,10 +191,15 @@ module ROM
         if new.nil?
           @body
         else
-          with(body: body.merge(new))
+          constructed_body = deep_copy(body)
+          new.each { |query| constructed_body.merge!(query) }
+          with(body: constructed_body)
         end
       end
 
+      def deep_copy(o)
+        Marshal.load(Marshal.dump(o))
+      end
       # Return a new dataset with new aggregations
       #
       # @param [Array<Aggregation>] new New aggregations
@@ -311,20 +316,45 @@ module ROM
         elsif params[:scroll]
           scroll_enumerator(client, response)
         else
-          response.fetch("hits").fetch("hits")
+          if response.fetch("responses").size > 1
+            response.fetch("responses").map do |res|
+              res.fetch("hits").fetch("hits")
+            end
+          else
+            response.fetch("responses").first.fetch("hits").fetch("hits")
+          end
         end
       end
 
       # @api private
       def response
-        options[:response] || client.search(**params, body: body_with_aggregations)
+        options[:response] || client.msearch(**params, body: body_with_aggregations)
       end
 
       def body_with_aggregations
-        return body if aggregations.empty?
+        constructed_body = []
+        if aggregations.empty?
+          return [{search: body}] if body.is_a?(Hash)
 
-        body.merge(aggs: body.fetch(:aggs,
-                                    {}).merge(Aggregation::QueryResolver.new(aggregations).to_query_fragment))
+          body.each do |query|
+            constructed_body.push({search: query})
+          end
+        else
+          if body.is_a?(Hash)
+            return [{search: define_aggregations(body)}]
+          end
+
+          body.each { |query|
+            constructed_body.push({search: define_aggregations(query)})
+          }
+        end
+        constructed_body
+      end
+
+      def define_aggregations(obj)
+        obj.merge(aggs: body.fetch(:aggs, {})
+                            .merge(Aggregation::QueryResolver.new(aggregations)
+                                       .to_query_fragment))
       end
     end
   end
