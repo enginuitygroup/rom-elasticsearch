@@ -15,13 +15,7 @@ module ROM
         #
         # @api public
         def total_hits
-          if response.fetch("responses").count > 1
-            response.fetch("responses").map do |res|
-              res.fetch("hits").fetch("total").fetch("value")
-            end
-          else
-            response.fetch("responses").first.fetch("hits").fetch("total").fetch("value")
-          end
+          response['hits']['total']['value']
         end
 
         # Return raw response from the ES client
@@ -41,9 +35,7 @@ module ROM
         def aggregations
           Aggregation::ResponseResolver.call(
             source.dataset.options[:aggregations],
-            response["responses"].size > 1 ? response["responses"].map{ |response|
-              response["aggregations"]
-            } : response["responses"].first["aggregations"]
+            response["aggregations"]
           )
         end
       end

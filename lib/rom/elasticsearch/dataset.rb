@@ -191,15 +191,12 @@ module ROM
         if new.nil?
           @body
         else
-          constructed_body = deep_copy(body)
-          new.each { |query| constructed_body.merge!(query) }
+          constructed_body = []
+          new.each { |query| constructed_body.push(query) }
           with(body: constructed_body)
         end
       end
 
-      def deep_copy(o)
-        Marshal.load(Marshal.dump(o))
-      end
       # Return a new dataset with new aggregations
       #
       # @param [Array<Aggregation>] new New aggregations
@@ -303,6 +300,14 @@ module ROM
         with(response: response)
       end
 
+      def call_with_response(res)
+        with(response: res)
+      end
+
+      def accessible_response
+        response
+      end
+
       private
 
       # Return results of a query based on configured params and body
@@ -316,19 +321,18 @@ module ROM
         elsif params[:scroll]
           scroll_enumerator(client, response)
         else
-          if response.fetch("responses").size > 1
-            response.fetch("responses").map do |res|
-              res.fetch("hits").fetch("hits")
-            end
-          else
-            response.fetch("responses").first.fetch("hits").fetch("hits")
-          end
+          response.fetch("hits").fetch("hits")
         end
       end
 
       # @api private
       def response
-        options[:response] || client.msearch(**params, body: body_with_aggregations)
+        if options[:response]
+          options[:response]
+        else
+          res = client.msearch(**params, body: body_with_aggregations)
+          body.size == 1 ? res["responses"].first : res
+        end
       end
 
       def body_with_aggregations

@@ -268,6 +268,13 @@ module ROM
         new(dataset.search(options))
       end
 
+      def load_response(queries, relations)
+        dataset_multi_query = dataset.search(queries)
+        loaded_dataset = dataset_multi_query.call
+        responses = loaded_dataset.accessible_response["responses"]
+        relations.map.with_index { |relation, index| new(relation.dataset.call_with_response(responses[index])) }
+      end
+
       # Restrict relation data by a query search
       #
       # @example
