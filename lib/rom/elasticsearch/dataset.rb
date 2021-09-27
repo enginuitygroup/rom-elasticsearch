@@ -356,7 +356,7 @@ module ROM
       end
 
       def define_aggregations(obj)
-        obj.merge(aggs: body.fetch(:aggs, {})
+        obj.merge(aggs: obj.fetch(:aggs, {})
                             .merge(Aggregation::QueryResolver.new(aggregations)
                                        .to_query_fragment))
       end

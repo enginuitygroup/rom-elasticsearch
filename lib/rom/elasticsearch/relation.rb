@@ -268,6 +268,13 @@ module ROM
         new(dataset.search(options))
       end
 
+      def multi_search(queries, aggregations = [])
+        relations = queries.map { |query| search([query]).aggregations(aggregations) }
+        return relations if queries.size == 1 # Return if its only a single relation
+        # Eager load the relations in a multi-search query if relations are more than one
+        load_response(queries, relations)
+      end
+
       def load_response(queries, relations)
         dataset_multi_query = dataset.search(queries)
         loaded_dataset = dataset_multi_query.call
