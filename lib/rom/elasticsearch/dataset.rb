@@ -191,9 +191,7 @@ module ROM
         if new.nil?
           @body
         else
-          constructed_body = []
-          new.each { |query| constructed_body.push(query) }
-          with(body: constructed_body)
+          with(body: body_with_aggregations(body.merge(new), aggregations))
         end
       end
 
@@ -209,7 +207,10 @@ module ROM
           @aggregations
         else
           new = [new] unless new.is_a?(Enumerable)
-          with(aggregations: aggregations.concat(new))
+          with(
+            body: body_with_aggregations(body, aggregations.concat(new)),
+            aggregations: aggregations.concat(new)
+          )
         end
       end
 
@@ -300,14 +301,6 @@ module ROM
         with(response: response)
       end
 
-      def call_with_response(res)
-        with(response: res)
-      end
-
-      def accessible_response
-        response
-      end
-
       private
 
       # Return results of a query based on configured params and body
@@ -327,38 +320,16 @@ module ROM
 
       # @api private
       def response
-        if options[:response]
-          options[:response]
-        else
-          res = client.msearch(**params, body: body_with_aggregations)
-          body.size == 1 ? res["responses"].first : res
-        end
+        options[:response] || client.search(**params, body: body)
       end
 
-      def body_with_aggregations
-        constructed_body = []
-        if aggregations.empty?
-          return [{search: body}] if body.is_a?(Hash)
+      def body_with_aggregations(body, aggregations)
+        return body if aggregations.empty?
 
-          body.each do |query|
-            constructed_body.push({search: query})
-          end
-        else
-          if body.is_a?(Hash)
-            return [{search: define_aggregations(body)}]
-          end
-
-          body.each { |query|
-            constructed_body.push({search: define_aggregations(query)})
-          }
-        end
-        constructed_body
-      end
-
-      def define_aggregations(obj)
-        obj.merge(aggs: obj.fetch(:aggs, {})
-                            .merge(Aggregation::QueryResolver.new(aggregations)
-                                       .to_query_fragment))
+        body.merge(
+          aggs: body.fetch(:aggs, {})
+                    .merge(Aggregation::QueryResolver.new(aggregations)
+                                                     .to_query_fragment))
       end
     end
   end

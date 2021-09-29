@@ -29,7 +29,6 @@ module ROM
             #
             # @api public
             def search(options = EMPTY_HASH, &block)
-              puts "search in query_dsl"
               if block
                 super(query_builder.search(&block).to_hash)
               else
