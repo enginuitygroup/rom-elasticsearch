@@ -24,13 +24,27 @@ module ROM
         relations.map {|r| [r.dataset.params, r.dataset.body] }.flatten
       end
 
-      def call
-        relations.map.with_index do |relation, index|
+      def to_a
+        to_enum.to_a
+      end
+
+      def each
+        return to_enum unless block_given?
+
+        relations.each.with_index do |relation, index|
           relation_response = response["responses"][index]
-          relation.class.new(
+          yield relation.class.new(
             relation.dataset.with(response: relation_response)
           )
         end
+      end
+
+      def map(&block)
+        to_a.map(&block)
+      end
+
+      def call
+        with(response: response)
       end
 
       private
