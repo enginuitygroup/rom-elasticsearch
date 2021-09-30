@@ -191,7 +191,7 @@ module ROM
         if new.nil?
           @body
         else
-          with(body: body.merge(new))
+          with(body: body_with_aggregations(body.merge(new), aggregations))
         end
       end
 
@@ -207,7 +207,10 @@ module ROM
           @aggregations
         else
           new = [new] unless new.is_a?(Enumerable)
-          with(aggregations: aggregations.concat(new))
+          with(
+            body: body_with_aggregations(body, aggregations.concat(new)),
+            aggregations: aggregations.concat(new)
+          )
         end
       end
 
@@ -317,14 +320,16 @@ module ROM
 
       # @api private
       def response
-        options[:response] || client.search(**params, body: body_with_aggregations)
+        options[:response] || client.search(**params, body: body)
       end
 
-      def body_with_aggregations
+      def body_with_aggregations(body, aggregations)
         return body if aggregations.empty?
 
-        body.merge(aggs: body.fetch(:aggs,
-                                    {}).merge(Aggregation::QueryResolver.new(aggregations).to_query_fragment))
+        body.merge(
+          aggs: body.fetch(:aggs, {})
+                    .merge(Aggregation::QueryResolver.new(aggregations)
+                                                     .to_query_fragment))
       end
     end
   end
