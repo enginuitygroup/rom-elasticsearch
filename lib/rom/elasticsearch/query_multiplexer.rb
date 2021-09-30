@@ -27,8 +27,8 @@ module ROM
       def call
         relations.map.with_index do |relation, index|
           relation_response = response["responses"][index]
-          relation.with(
-            dataset: relation.dataset.with(response: relation_response)
+          relation.class.new(
+            relation.dataset.with(response: relation_response)
           )
         end
       end
