@@ -9,6 +9,7 @@ module ROM
 
       param :client
       option :relations, default: -> { [] }
+      option :size, default: -> { 10 }
       option :response, optional: true, reader: false
 
       def relations(new = nil)
@@ -20,8 +21,12 @@ module ROM
         end
       end
 
+      def set_size(size)
+        with(size: size)
+      end
+
       def body
-        relations.map {|r| [r.dataset.params, r.dataset.body] }.flatten
+        relations.map { |r| [r.dataset.params, r.dataset.body.merge({size: @size})] }.flatten
       end
 
       def to_a
